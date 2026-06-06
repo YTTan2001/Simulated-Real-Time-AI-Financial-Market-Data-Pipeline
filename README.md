@@ -47,9 +47,9 @@ PostgreSQL Database
 - Designing scalable architectures for financial data processing.
 
 ## Appendix
-![alt text](images/image.png)
+![alt text](Images/image.png)
 _Daily data loaded into postgresSQL database successfully with 1 min interval_
 
-![alt text](images/image-2.png)
-![alt text](images/image-1.png)
+![alt text](Images/image-2.png)
+![alt text](Images/image-1.png)
 _Postgres database that store real-time raw market data_
