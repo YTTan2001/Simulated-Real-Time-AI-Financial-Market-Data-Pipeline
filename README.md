@@ -95,4 +95,4 @@ _This causes downstream anomalies detection function failed_
 _By observing quality check task logs, one bad record found, airflow skipped the bad record_
 
 ![alt text](Images/image-6.png)
-_Extract anomalies data_
+_Extract anomalies data in PostgreSQL_
