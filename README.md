@@ -1,55 +1,98 @@
-# AI Financial Market Analysis (Phase 1)
-## Project Description
-Phase 1 focuses on building a real-time financial market data ingestion pipeline. Historical market data stored in a CSV file is streamed to simulate real-time market activity. The objective of this phase is to establish a scalable and reliable data pipeline for collecting and storing financial data, without performing any data analysis or visualization.
+# AI Financial Market Analysis (Phase 2)
 
-## Technologies Used
-### Apache Kafka
-Apache Kafka serves as the real-time streaming platform for the project.
-- *Kafka Producer* reads market data from a CSV file and publishes records at fixed intervals to simulate live market feeds.
-- *Kafka Broker* manages message delivery through Kafka topics.
-- *Kafka Consumer* subscribes to topics and processes incoming market data for downstream storage.
+## Project Description (Phase 2)
+Phase 2 extends the real-time streaming pipeline built in Phase 1 by introducing **workflow orchestration, data quality validation, and anomaly detection** using Apache Airflow.
 
-### PostgreSQL
-PostgreSQL is used as the centralized database for storing raw financial market data received from Kafka.
-- Stores historical and streamed market records.
-- Provides a structured foundation for future analysis and reporting phases.
+This phase focuses on improving pipeline reliability, automation, and data trustworthiness before data is stored and used for downstream analytics.
 
-### Docker
-Docker containerizes all project components to ensure:
-- Consistent development and deployment environments.
-- Easy setup and execution across different machines.
-- Simplified dependency management.
 
-## Project Workflow
-CSV Market Data
-       │
-       ▼
-Kafka Producer
-       │
-       ▼
-Kafka Topic (market_data)
-       │
-       ▼
-Kafka Consumer
-       │
-       ▼
-PostgreSQL Database
+## Project Objectives (Phase 2)
+- Orchestrate data pipeline using Apache Airflow
+- Implement scheduled and near real-time processing workflows
+- Perform data quality checks on incoming financial data
+- Detect anomalies in market behavior
+- Improve pipeline reliability and observability
 
-## Future Enhancements (Phase 2)
-- Near real-time data processing/ data quality check (orchestrated by Apache Airflow)
-- Anomalies detection (orchestrated by Apache Airflow)
 
-## Key Learning Outcomes
-- Building event-driven data pipelines using Apache Kafka.
-- Simulating real-time data streams from historical datasets.
-- Integrating Kafka with PostgreSQL for persistent storage.
-- Containerizing distributed systems with Docker.
-- Designing scalable architectures for financial data processing.
+## Technologies Used (Phase 2)
+- **Apache Airflow** → Workflow orchestration and scheduling
+- **Python** → Data processing and anomaly detection
+- **Kafka (Phase 1)** → Streaming data ingestion layer
+- **PostgreSQL (Phase 1)** → Data storage layer
+- **Pandas / NumPy** → Data validation and analysis
+- **Docker** → Containerized environment for reproducibility
+
+
+## Project Workflow (Phase 2)
+Kafka
+  ↓
+PostgreSQL (raw market_data)
+  ↓
+Airflow DAG
+  ├── Data Quality Check
+  ├── Anomaly Detection
+  └── Store Results (PostgreSQL)
+
+
+## Key Components (Phase 2)
+
+### 1. Apache Airflow Orchestration
+- Schedules and manages pipeline execution
+- Defines task dependencies (ETL workflow)
+- Ensures reliable and automated data processing
+
+### 2. Data Quality Checks
+- Missing value detection
+- Schema validation (column integrity)
+- Data type validation
+- Business rule validation (e.g., revenue ≥ 0)
+
+### 3. Anomaly Detection
+- Detects unusual stock impact values
+- Identifies abnormal revenue growth patterns
+- Flags outliers using statistical methods (e.g., Z-score)
+
+
+## Example Checks Implemented (Phase 2)
+- Null value detection
+- Column existence validation
+- Range validation for financial metrics
+- Outlier detection using statistical thresholds
+
+
+## Key Learning Outcomes (Phase 2)
+- Built workflow orchestration using Apache Airflow
+- Understood ETL scheduling and task dependencies
+- Implemented data quality validation techniques
+- Applied basic anomaly detection methods
+- Improved pipeline reliability and observability
+
+
+## Future Enhancements (Phase 3)
+- Real-time dashboard using Metabase / Superset
+- Advanced ML-based anomaly detection
+- Alerting system (email / Slack notifications)
+- Data lake integration (S3 / MinIO)
+- Scalable processing using Apache Spark
+
 
 ## Appendix
+- **Phase 1:** CSV → Kafka → PostgreSQL streaming pipeline
+- **Phase 2:** Airflow orchestration + data validation + anomaly detection
+
+
 ![alt text](Images/image.png)
-_Daily data loaded into postgresSQL database successfully with 1 min interval_
+_Airflow successfully schedule data quality check and anomaly detection_
 
 ![alt text](Images/image-2.png)
-![alt text](Images/image-1.png)
-_Postgres database that store real-time raw market data_
+![alt text](Images/image-4.png)
+_DAG is running market pipeline, the eight data is failed at quality check as the revenue is a negative value_
+
+![alt text](Images/image-3.png)
+_This causes downstream anomalies detection function failed_
+
+![alt text](Images/image-5.png)
+_By observing quality check task logs, one bad record found, airflow skipped the bad record_
+
+![alt text](Images/image-6.png)
+_Extract anomalies data_
