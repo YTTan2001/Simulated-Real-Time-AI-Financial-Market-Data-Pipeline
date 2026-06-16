@@ -5,7 +5,7 @@ Develop a real-time analytics platform that monitors AI company financial indica
 
 
 ## Project Architecture
-![alt text](Images/image-3.png)
+![alt text](Images/image-4.png)
 
 ## Appendix
 ![alt text](Images/image-2.png)
