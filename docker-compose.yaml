@@ -1,4 +1,4 @@
-# Setting up apache kafka with zookeeper
+# Setting up apache kafka
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -21,27 +21,43 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   producer:
-    build: .
-    command: python -u kafka/producer.py
+    build: 
+      context: .
+      dockerfile: ./kafka/Dockerfile
     volumes:
       - ./data:/app/data
+    working_dir: /app
     depends_on:
       - kafka
 
-  consumer:
-    build: .
-    command: python -u kafka/consumer.py
-    volumes:
-      - ./data:/app/data
+  
+  # Setting up apache spark
+  spark-stream:
+    build: ./spark
+    command: >
+      /opt/spark/bin/spark-submit
+      --packages
+      org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.postgresql:postgresql:42.7.3
+      spark_streaming.py
+    container_name: spark-stream
+    dns:
+      - 8.8.8.8
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
     depends_on:
       - kafka
       - postgres
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  # PostgreSQL Database for storing market data
+
+  # Setting up PostgreSQL Database for storing market data
   postgres:
     image: postgres:13
     environment:
@@ -53,25 +69,39 @@ services:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
-
-  # Add Airflow services
+  
   airflow:
-    build: .
+    build:
+      context: ./airflow
+      dockerfile: Dockerfile
     container_name: airflow
     depends_on:
       - postgres
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
+    ports:
+      - "8080:8080"
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-      AIRFLOW__WEBSERVER__DEFAULT_USER_USERNAME: ${AIRFLOW_USER}
-      AIRFLOW__WEBSERVER__DEFAULT_USER_PASSWORD: ${AIRFLOW_PASSWORD}
-      PYTHONPATH: /opt/airflow
+      EMAIL_ADDRESS: ${EMAIL_ADDRESS}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
     command: airflow standalone
+
+    # Metabase for dashboard and visualization
+  metabase:
+    image: metabase/metabase
+    container_name: metabase
     ports:
-      - "8080:8080"
+      - "3000:3000"
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+
 volumes:
   postgres_data:
