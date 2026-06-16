@@ -22,7 +22,7 @@ Metabase Dashboard
 
 
 ## Appendix
-![alt text](Images/image.png)
+![alt text](Images/image-2.png)
 _Real-time dashboard that automatically refreshed every 5 minutes_
 
 ![alt text](Images/image-1.png)
