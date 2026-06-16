@@ -5,20 +5,7 @@ Develop a real-time analytics platform that monitors AI company financial indica
 
 
 ## Project Architecture
-Kafka
-   ↓
-Spark Streaming
-   ↓
-clean_market_data
-   ↓
-Airflow
-   ├── anomaly_detection
-   ├── send_alert
-   └── reporting
-   ↓
-PostgreSQL
-   ↓
-Metabase Dashboard
+![alt text](Images/image-3.png)
 
 
 ## Appendix
